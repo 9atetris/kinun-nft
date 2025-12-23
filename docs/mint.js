@@ -16,10 +16,8 @@ let lastX = 0;
 let lastY = 0;
 const yawLimit = 24;
 
-let activeProvider = null;
 let activeAccount = null;
 let activeAddress = null;
-let activeChainId = null;
 
 const clamp = (val, min, max) => Math.min(max, Math.max(min, val));
 
@@ -77,16 +75,6 @@ const getWalletProvider = (wallet) => {
   return window.starknet || null;
 };
 
-const walletMatches = (provider, wallet) => {
-  if (!provider) return false;
-  if (provider === window.starknet) return true;
-  const id = (provider.id || provider.name || "").toLowerCase();
-  if (!id || id === "starknet") return true;
-  if (wallet === "argent") return id.includes("argent");
-  if (wallet === "braavos") return id.includes("braavos");
-  return true;
-};
-
 const connectWallet = async (wallet) => {
   const provider = getWalletProvider(wallet);
   if (!provider) {
@@ -96,10 +84,6 @@ const connectWallet = async (wallet) => {
 
   try {
     setStatus("Connecting wallet...", "busy");
-    if (!walletMatches(provider, wallet)) {
-      setStatus("Selected wallet is not available in this browser.", "error");
-      return;
-    }
 
     let accounts = null;
     if (provider.request) {
@@ -129,26 +113,8 @@ const connectWallet = async (wallet) => {
       return;
     }
 
-    let chainId = null;
-    try {
-      if (provider.getChainId) {
-        chainId = await provider.getChainId();
-      } else if (account.getChainId) {
-        chainId = await account.getChainId();
-      }
-    } catch (err) {
-      console.warn("getChainId failed", err);
-    }
-
-    if (chainId && chainId !== MAINNET_CHAIN_ID) {
-      setStatus("Please switch to Starknet Mainnet.", "error");
-      return;
-    }
-
-    activeProvider = provider;
     activeAccount = account;
     activeAddress = address;
-    activeChainId = chainId;
     setStatus(`Connected: ${formatHash(address)}`, "success");
   } catch (err) {
     console.error(err);
@@ -168,12 +134,15 @@ mintButton.addEventListener("click", async () => {
   try {
     setStatus("Minting...", "busy");
 
-    let chainId = activeChainId;
+    let chainId = null;
     try {
-      chainId = chainId || (await activeAccount.getChainId?.());
+      if (activeAccount.getChainId) {
+        chainId = await activeAccount.getChainId();
+      }
     } catch (err) {
       console.warn("getChainId failed", err);
     }
+
     if (chainId && chainId !== MAINNET_CHAIN_ID) {
       setStatus("Please switch to Starknet Mainnet.", "error");
       return;
