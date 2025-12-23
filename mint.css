@@ -95,9 +95,20 @@ h1 {
 }
 
 .actions {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+}
+
+.connect-row {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  justify-content: center;
+}
+
+.mint-row {
+  display: flex;
   justify-content: center;
 }
 
