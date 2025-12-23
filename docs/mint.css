@@ -111,10 +111,12 @@ h1 {
 }
 
 .btn.connect {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(26, 18, 13, 0.2);
+  background: linear-gradient(135deg, rgba(247, 196, 90, 0.35), rgba(227, 75, 46, 0.2));
+  border: 1px solid rgba(227, 75, 46, 0.35);
   color: #5a3124;
-  padding: 12px 20px;
+  padding: 14px 28px;
+  min-width: 180px;
+  text-align: center;
 }
 
 .btn.mint {
