@@ -65,14 +65,6 @@ const setStatus = (message, state = "") => {
 const formatHash = (hash) =>
   hash ? `${hash.slice(0, 8)}…${hash.slice(-6)}` : "";
 
-const walletMatches = (provider, wallet) => {
-  if (!provider?.id) return true;
-  const id = provider.id.toLowerCase();
-  if (wallet === "argent") return id.includes("argent");
-  if (wallet === "braavos") return id.includes("braavos");
-  return true;
-};
-
 const getWalletProvider = (wallet) => {
   if (wallet === "argent" && window.starknet_argentX) {
     return window.starknet_argentX;
@@ -83,12 +75,37 @@ const getWalletProvider = (wallet) => {
   return window.starknet || null;
 };
 
+const walletMatches = (provider, wallet) => {
+  if (!provider) return false;
+  const id = (provider.id || provider.name || "").toLowerCase();
+  if (!id) return true;
+  if (wallet === "argent") return !id.includes("braavos");
+  if (wallet === "braavos") return !id.includes("argent");
+  return true;
+};
+
+const showModal = () => {
+  if (typeof modal.showModal === "function") {
+    modal.showModal();
+  } else {
+    modal.setAttribute("open", "true");
+  }
+};
+
+const closeModal = () => {
+  if (typeof modal.close === "function") {
+    modal.close();
+  } else {
+    modal.removeAttribute("open");
+  }
+};
+
 mintButton.addEventListener("click", () => {
-  modal.showModal();
+  showModal();
 });
 
 closeButton.addEventListener("click", () => {
-  modal.close();
+  closeModal();
 });
 
 walletButtons.forEach((button) => {
@@ -102,14 +119,18 @@ walletButtons.forEach((button) => {
       );
       return;
     }
-    if (!walletMatches(provider, wallet)) {
-      setStatus("Selected wallet is not available in this browser.", "error");
-      return;
-    }
-
     try {
       setStatus("Connecting wallet...", "busy");
-      await provider.enable();
+      if (!walletMatches(provider, wallet)) {
+        setStatus("Selected wallet is not available in this browser.", "error");
+        return;
+      }
+
+      if (provider.request) {
+        await provider.request({ type: "wallet_requestAccounts" });
+      } else {
+        await provider.enable();
+      }
 
       const chainId = await provider.getChainId();
       if (chainId !== MAINNET_CHAIN_ID) {
@@ -132,7 +153,7 @@ walletButtons.forEach((button) => {
         calldata: [to, amount.low, amount.high],
       });
 
-      modal.close();
+      closeModal();
       statusEl.innerHTML = `Mint submitted. <a href="https://voyager.online/tx/${tx.transaction_hash}" target="_blank" rel="noreferrer">${formatHash(
         tx.transaction_hash
       )}</a>`;
