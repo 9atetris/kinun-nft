@@ -222,12 +222,19 @@ h1 {
 }
 
 .wallet-modal {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
   border: none;
   border-radius: 20px;
   padding: 24px;
   max-width: 360px;
   width: 88vw;
   box-shadow: 0 24px 60px rgba(21, 12, 7, 0.3);
+}
+
+.wallet-modal:not([open]) {
+  display: none;
 }
 
 .wallet-modal::backdrop {

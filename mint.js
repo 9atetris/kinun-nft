@@ -1,5 +1,3 @@
-import { uint256, StarknetChainId } from "https://esm.sh/starknet@6.9.0";
-
 const mintButton = document.getElementById("mint");
 const modal = document.getElementById("wallet-modal");
 const closeButton = document.getElementById("wallet-close");
@@ -10,7 +8,7 @@ const statusEl = document.getElementById("status");
 
 const CONTRACT_ADDRESS =
   "0x01bbf1cc158c2843d0300e643fa6e562af2e4d4aea43224528a5850a06358828";
-const MAINNET_CHAIN_ID = StarknetChainId?.SN_MAIN || "0x534e5f4d41494e";
+const MAINNET_CHAIN_ID = "0x534e5f4d41494e";
 
 let rotX = -6;
 let rotY = 0;
@@ -146,7 +144,7 @@ walletButtons.forEach((button) => {
       }
 
       setStatus("Minting...", "busy");
-      const amount = uint256.bnToUint256(1n);
+      const amount = { low: "0x1", high: "0x0" };
       const tx = await account.execute({
         contractAddress: CONTRACT_ADDRESS,
         entrypoint: "mint",
