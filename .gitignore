@@ -1,0 +1,6 @@
+/target
+/**/target
+*.sierra.json
+*.casm.json
+scarb.lock
+.DS_Store
