@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 #[starknet::contract]
 pub mod Kinun1155 {
-    use core::num::traits::Zero;
-    use openzeppelin_access::ownable::OwnableComponent;
-    use openzeppelin_introspection::src5::SRC5Component;
-    use openzeppelin_token::erc1155::{ERC1155Component, ERC1155HooksEmptyImpl};
-    use starknet::{ByteArray, ContractAddress};
+    use core::byte_array::ByteArray;
+    use openzeppelin::access::ownable::OwnableComponent;
+    use openzeppelin::introspection::src5::SRC5Component;
+    use openzeppelin::token::erc1155::{ERC1155Component, ERC1155HooksEmptyImpl};
+    use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
+    use starknet::ContractAddress;
 
     const TOKEN_ID: u256 = u256 { low: 1, high: 0 };
 
@@ -21,12 +22,8 @@ pub mod Kinun1155 {
     // ERC1155 Mixin
     #[abi(embed_v0)]
     impl ERC1155MixinImpl = ERC1155Component::ERC1155MixinImpl<ContractState>;
-    #[abi(embed_v0)]
-    impl ERC1155MetadataURIImpl = ERC1155Component::ERC1155MetadataURIImpl<ContractState>;
-    #[abi(embed_v0)]
-    impl ERC1155CamelImpl = ERC1155Component::ERC1155CamelImpl<ContractState>;
     impl ERC1155InternalImpl = ERC1155Component::InternalImpl<ContractState>;
-    impl ERC1155HooksEmptyImpl = ERC1155HooksEmptyImpl<ContractState>;
+    impl ERC1155HooksDefaultImpl = ERC1155HooksEmptyImpl<ContractState>;
 
     #[storage]
     pub struct Storage {
@@ -50,18 +47,6 @@ pub mod Kinun1155 {
         ERC1155Event: ERC1155Component::Event,
         #[flat]
         SRC5Event: SRC5Component::Event,
-        MintEnabled: MintEnabled,
-        BaseURISet: BaseURISet,
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct MintEnabled {
-        enabled: bool,
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct BaseURISet {
-        value: ByteArray,
     }
 
     #[starknet::interface]
@@ -78,7 +63,7 @@ pub mod Kinun1155 {
     fn constructor(ref self: ContractState, base_uri: ByteArray, owner: ContractAddress) {
         self.ownable.initializer(owner);
         self.erc1155.initializer(base_uri);
-        self.total_minted.write(u256::zero());
+        self.total_minted.write(u256 { low: 0, high: 0 });
         self.max_supply.write(u256 { low: 10000, high: 0 });
         self.mint_enabled.write(true);
     }
@@ -100,13 +85,11 @@ pub mod Kinun1155 {
         fn set_base_uri(ref self: ContractState, base_uri: ByteArray) {
             self.ownable.assert_only_owner();
             self.erc1155._set_base_uri(base_uri);
-            self.emit(BaseURISet { value: base_uri });
         }
 
         fn set_mint_enabled(ref self: ContractState, enabled: bool) {
             self.ownable.assert_only_owner();
             self.mint_enabled.write(enabled);
-            self.emit(MintEnabled { enabled });
         }
 
         fn total_minted(self: @ContractState) -> u256 {
@@ -123,7 +106,7 @@ pub mod Kinun1155 {
     }
 
     #[external(v0)]
-    fn token_id() -> u256 {
+    fn token_id(self: @ContractState) -> u256 {
         TOKEN_ID
     }
 }
