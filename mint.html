@@ -21,6 +21,8 @@
             for your wallet.
           </p>
           <div class="actions">
+            <button class="btn connect" id="connect-argent">Connect Argent</button>
+            <button class="btn connect" id="connect-braavos">Connect Braavos</button>
             <button class="btn mint" id="mint">Mint</button>
           </div>
           <p class="status" id="status"></p>
@@ -39,18 +41,6 @@
         <div class="chip">Base URI: raw GitHub</div>
       </section>
     </main>
-
-    <dialog class="wallet-modal" id="wallet-modal">
-      <div class="wallet-header">
-        <h2>Choose Wallet</h2>
-        <p>Select a wallet to connect for minting.</p>
-      </div>
-      <div class="wallet-actions">
-        <button class="wallet-btn" data-wallet="argent">Ready (Argent)</button>
-        <button class="wallet-btn" data-wallet="braavos">Braavos</button>
-      </div>
-      <button class="wallet-close" id="wallet-close">Close</button>
-    </dialog>
 
     <script src="mint.js"></script>
   </body>

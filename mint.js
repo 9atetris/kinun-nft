@@ -1,7 +1,6 @@
 const mintButton = document.getElementById("mint");
-const modal = document.getElementById("wallet-modal");
-const closeButton = document.getElementById("wallet-close");
-const walletButtons = document.querySelectorAll(".wallet-btn");
+const connectArgent = document.getElementById("connect-argent");
+const connectBraavos = document.getElementById("connect-braavos");
 const viewer = document.getElementById("viewer");
 const card = document.getElementById("card");
 const statusEl = document.getElementById("status");
@@ -16,6 +15,11 @@ let isDragging = false;
 let lastX = 0;
 let lastY = 0;
 const yawLimit = 24;
+
+let activeProvider = null;
+let activeAccount = null;
+let activeAddress = null;
+let activeChainId = null;
 
 const clamp = (val, min, max) => Math.min(max, Math.max(min, val));
 
@@ -77,94 +81,99 @@ const walletMatches = (provider, wallet) => {
   if (!provider) return false;
   const id = (provider.id || provider.name || "").toLowerCase();
   if (!id) return true;
-  if (wallet === "argent") return !id.includes("braavos");
-  if (wallet === "braavos") return !id.includes("argent");
+  if (wallet === "argent") return id.includes("argent");
+  if (wallet === "braavos") return id.includes("braavos");
   return true;
 };
 
-const showModal = () => {
-  if (typeof modal.showModal === "function") {
-    modal.showModal();
-  } else {
-    modal.setAttribute("open", "true");
+const connectWallet = async (wallet) => {
+  const provider = getWalletProvider(wallet);
+  if (!provider) {
+    setStatus("Wallet not found. Open this page in Argent or Braavos.", "error");
+    return;
   }
-};
 
-const closeModal = () => {
-  if (typeof modal.close === "function") {
-    modal.close();
-  } else {
-    modal.removeAttribute("open");
-  }
-};
-
-mintButton.addEventListener("click", () => {
-  showModal();
-});
-
-closeButton.addEventListener("click", () => {
-  closeModal();
-});
-
-walletButtons.forEach((button) => {
-  button.addEventListener("click", async () => {
-    const wallet = button.dataset.wallet;
-    const provider = getWalletProvider(wallet);
-    if (!provider) {
-      setStatus(
-        "Wallet not found. Open this page in Argent or Braavos, or install the extension.",
-        "error"
-      );
+  try {
+    setStatus("Connecting wallet...", "busy");
+    if (!walletMatches(provider, wallet)) {
+      setStatus("Selected wallet is not available in this browser.", "error");
       return;
     }
-    try {
-      setStatus("Connecting wallet...", "busy");
-      if (!walletMatches(provider, wallet)) {
-        setStatus("Selected wallet is not available in this browser.", "error");
-        return;
-      }
 
-      let accounts = null;
-      if (provider.request) {
-        accounts = await provider.request({ type: "wallet_requestAccounts" });
-      }
-      if (provider.enable) {
-        await provider.enable();
-      }
-
-      const chainId = await provider.getChainId();
-      if (chainId !== MAINNET_CHAIN_ID) {
-        setStatus("Please switch to Starknet Mainnet.", "error");
-        return;
-      }
-
-      const account = provider.account || provider;
-      const to =
-        provider.selectedAddress ||
-        accounts?.[0] ||
-        account?.address ||
-        account?.selectedAddress;
-      if (!account || !account.execute || !to) {
-        setStatus("Wallet account not detected.", "error");
-        return;
-      }
-
-      setStatus("Minting...", "busy");
-      const amount = { low: "0x1", high: "0x0" };
-      const tx = await account.execute({
-        contractAddress: CONTRACT_ADDRESS,
-        entrypoint: "mint",
-        calldata: [to, amount.low, amount.high],
-      });
-
-      closeModal();
-      statusEl.innerHTML = `Mint submitted. <a href="https://voyager.online/tx/${tx.transaction_hash}" target="_blank" rel="noreferrer">${formatHash(
-        tx.transaction_hash
-      )}</a>`;
-      statusEl.dataset.state = "success";
-    } catch (err) {
-      console.error(err);
-      setStatus("Mint failed. Please try again.", "error");
+    let accounts = null;
+    if (provider.request) {
+      accounts = await provider.request({ type: "wallet_requestAccounts" });
     }
-  });
+    if (provider.enable) {
+      await provider.enable();
+    }
+
+    const account = provider.account || provider;
+    const address =
+      provider.selectedAddress ||
+      accounts?.[0] ||
+      account?.address ||
+      account?.selectedAddress;
+
+    if (!account || !account.execute || !address) {
+      setStatus("Wallet account not detected.", "error");
+      return;
+    }
+
+    let chainId = null;
+    if (provider.getChainId) {
+      chainId = await provider.getChainId();
+    } else if (account.getChainId) {
+      chainId = await account.getChainId();
+    }
+
+    if (chainId && chainId !== MAINNET_CHAIN_ID) {
+      setStatus("Please switch to Starknet Mainnet.", "error");
+      return;
+    }
+
+    activeProvider = provider;
+    activeAccount = account;
+    activeAddress = address;
+    activeChainId = chainId;
+    setStatus(`Connected: ${formatHash(address)}`, "success");
+  } catch (err) {
+    console.error(err);
+    setStatus(`Connect failed: ${err?.message || "Please try again."}`, "error");
+  }
+};
+
+connectArgent?.addEventListener("click", () => connectWallet("argent"));
+connectBraavos?.addEventListener("click", () => connectWallet("braavos"));
+
+mintButton.addEventListener("click", async () => {
+  if (!activeAccount || !activeAddress) {
+    setStatus("Connect wallet first.", "error");
+    return;
+  }
+
+  try {
+    setStatus("Minting...", "busy");
+
+    const chainId = activeChainId || (await activeAccount.getChainId?.());
+    if (chainId && chainId !== MAINNET_CHAIN_ID) {
+      setStatus("Please switch to Starknet Mainnet.", "error");
+      return;
+    }
+
+    const amount = { low: "0x1", high: "0x0" };
+    const tx = await activeAccount.execute({
+      contractAddress: CONTRACT_ADDRESS,
+      entrypoint: "mint",
+      calldata: [activeAddress, amount.low, amount.high],
+    });
+
+    statusEl.innerHTML = `Mint submitted. <a href="https://voyager.online/tx/${tx.transaction_hash}" target="_blank" rel="noreferrer">${formatHash(
+      tx.transaction_hash
+    )}</a>`;
+    statusEl.dataset.state = "success";
+  } catch (err) {
+    console.error(err);
+    setStatus(`Mint failed: ${err?.message || "Please try again."}`, "error");
+  }
 });
