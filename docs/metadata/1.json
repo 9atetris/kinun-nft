@@ -1,8 +1,8 @@
 {
   "name": "金運の御守り",
   "description": "金運を招く御守りNFT。",
-  "image": "https://<GITHUB_USER>.github.io/<REPO>/assets/kinun-omamori.png",
-  "animation_url": "https://<GITHUB_USER>.github.io/<REPO>/index.html",
+  "image": "https://9atetris.github.io/kinun-nft/assets/kinun-omamori.png",
+  "animation_url": "https://9atetris.github.io/kinun-nft/index.html",
   "attributes": [
     { "trait_type": "Series", "value": "Kinun" },
     { "trait_type": "Network", "value": "Starknet" }
