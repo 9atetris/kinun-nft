@@ -124,9 +124,11 @@ walletButtons.forEach((button) => {
         return;
       }
 
+      let accounts = null;
       if (provider.request) {
-        await provider.request({ type: "wallet_requestAccounts" });
-      } else {
+        accounts = await provider.request({ type: "wallet_requestAccounts" });
+      }
+      if (provider.enable) {
         await provider.enable();
       }
 
@@ -136,9 +138,13 @@ walletButtons.forEach((button) => {
         return;
       }
 
-      const account = provider.account;
-      const to = provider.selectedAddress || account?.address;
-      if (!account || !to) {
+      const account = provider.account || provider;
+      const to =
+        provider.selectedAddress ||
+        accounts?.[0] ||
+        account?.address ||
+        account?.selectedAddress;
+      if (!account || !account.execute || !to) {
         setStatus("Wallet account not detected.", "error");
         return;
       }
