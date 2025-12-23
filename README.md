@@ -7,7 +7,7 @@ This repo contains:
 ## GitHub Pages setup
 1. Create a GitHub repo and push this project.
 2. In repo settings → Pages, set **Source** to `main` and **/docs` folder**.
-3. Replace placeholders in `docs/metadata/1.json`:
+3. Replace placeholders in `docs/metadata/{id}.json`:
    - `https://<GITHUB_USER>.github.io/<REPO>/...`
 
 ## Contract details
@@ -27,13 +27,13 @@ starkli declare target/dev/kinun_Kinun1155.contract_class.json --network sepolia
 starkli deploy <CLASS_HASH> \
   --network sepolia \
   --account <ACCOUNT> \
-  "bytearray:str:https://<GITHUB_USER>.github.io/<REPO>/metadata/1.json" <OWNER_ADDRESS>
+  "bytearray:str:https://<GITHUB_USER>.github.io/<REPO>/metadata/{id}.json" <OWNER_ADDRESS>
 ```
 
 ## Sepolia deployment (current)
 - Class hash: `0x004167ec3f4c079e8dffe6e9e84c1d28cecfb376fbbad295434189e2588d5804`
 - Contract address: `0x0718a58b9aad35fcd2e470d98626b31767c965007b18a69f0c9c2881c3c068ce`
-- Base URI: `https://9atetris.github.io/kinun-nft/metadata/1.json`
+- Base URI: `https://9atetris.github.io/kinun-nft/metadata/{id}.json`
 
 ## Mint (example)
 ```
