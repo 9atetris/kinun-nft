@@ -114,6 +114,9 @@ h1 {
   background: linear-gradient(135deg, var(--orange) 0%, #f16118 100%);
   color: #fff7ea;
   box-shadow: 0 16px 30px rgba(243, 139, 31, 0.35);
+  padding: 18px 36px;
+  font-size: 1.2rem;
+  border-radius: 18px;
 }
 
 .btn.mint:hover {
@@ -143,6 +146,7 @@ h1 {
   perspective: 1200px;
   width: min(60vw, 520px);
   max-width: 92vw;
+  justify-self: center;
 }
 
 .card::before {
@@ -157,11 +161,13 @@ h1 {
 .card-inner {
   transform-style: preserve-3d;
   transition: transform 0.1s linear;
+  display: grid;
+  place-items: center;
 }
 
 .card img {
-  width: min(90vw, 420px);
-  max-height: 70vh;
+  width: min(70vw, 300px);
+  max-height: 60vh;
   display: block;
   user-select: none;
   -webkit-user-drag: none;
@@ -190,7 +196,7 @@ h1 {
   }
 
   .card img {
-    width: min(86vw, 340px);
+    width: min(70vw, 260px);
   }
 }
 
