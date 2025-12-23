@@ -79,8 +79,9 @@ const getWalletProvider = (wallet) => {
 
 const walletMatches = (provider, wallet) => {
   if (!provider) return false;
+  if (provider === window.starknet) return true;
   const id = (provider.id || provider.name || "").toLowerCase();
-  if (!id) return true;
+  if (!id || id === "starknet") return true;
   if (wallet === "argent") return id.includes("argent");
   if (wallet === "braavos") return id.includes("braavos");
   return true;
@@ -102,10 +103,18 @@ const connectWallet = async (wallet) => {
 
     let accounts = null;
     if (provider.request) {
-      accounts = await provider.request({ type: "wallet_requestAccounts" });
+      try {
+        accounts = await provider.request({ type: "wallet_requestAccounts" });
+      } catch (err) {
+        console.warn("wallet_requestAccounts failed", err);
+      }
     }
     if (provider.enable) {
-      await provider.enable();
+      try {
+        await provider.enable();
+      } catch (err) {
+        console.warn("enable failed", err);
+      }
     }
 
     const account = provider.account || provider;
@@ -121,10 +130,14 @@ const connectWallet = async (wallet) => {
     }
 
     let chainId = null;
-    if (provider.getChainId) {
-      chainId = await provider.getChainId();
-    } else if (account.getChainId) {
-      chainId = await account.getChainId();
+    try {
+      if (provider.getChainId) {
+        chainId = await provider.getChainId();
+      } else if (account.getChainId) {
+        chainId = await account.getChainId();
+      }
+    } catch (err) {
+      console.warn("getChainId failed", err);
     }
 
     if (chainId && chainId !== MAINNET_CHAIN_ID) {
@@ -155,7 +168,12 @@ mintButton.addEventListener("click", async () => {
   try {
     setStatus("Minting...", "busy");
 
-    const chainId = activeChainId || (await activeAccount.getChainId?.());
+    let chainId = activeChainId;
+    try {
+      chainId = chainId || (await activeAccount.getChainId?.());
+    } catch (err) {
+      console.warn("getChainId failed", err);
+    }
     if (chainId && chainId !== MAINNET_CHAIN_ID) {
       setStatus("Please switch to Starknet Mainnet.", "error");
       return;
