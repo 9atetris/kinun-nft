@@ -1,6 +1,5 @@
 const viewer = document.getElementById('viewer');
 const card = document.getElementById('card');
-const reset = document.getElementById('reset');
 
 let rotX = -8;
 let rotY = 0;
@@ -40,11 +39,5 @@ const stopDrag = () => {
 viewer.addEventListener('pointerup', stopDrag);
 viewer.addEventListener('pointerleave', stopDrag);
 viewer.addEventListener('pointercancel', stopDrag);
-
-reset.addEventListener('click', () => {
-  rotX = -8;
-  rotY = 0;
-  render();
-});
 
 render();
