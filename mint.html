@@ -23,6 +23,7 @@
           <div class="actions">
             <button class="btn mint" id="mint">Mint</button>
           </div>
+          <p class="status" id="status"></p>
           <p class="note">Mainnet · ERC-1155 · Supply 10,000</p>
         </div>
         <div class="card" id="viewer" aria-label="3D viewer">
@@ -45,12 +46,12 @@
         <p>Select a wallet to connect for minting.</p>
       </div>
       <div class="wallet-actions">
-        <button class="wallet-btn" data-wallet="argent">Argent</button>
+        <button class="wallet-btn" data-wallet="argent">Ready (Argnet)</button>
         <button class="wallet-btn" data-wallet="braavos">Braavos</button>
       </div>
       <button class="wallet-close" id="wallet-close">Close</button>
     </dialog>
 
-    <script src="mint.js"></script>
+    <script type="module" src="mint.js"></script>
   </body>
 </html>
