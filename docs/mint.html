@@ -16,14 +16,19 @@
             金運の御守りをStarknetで受け取る。静かな神域の気配をまとった
             デジタル御守りです。
           </p>
+          <p class="lede en">
+            Receive a Prosperity Omamori on Starknet. A quiet, auspicious charm
+            for your wallet.
+          </p>
           <div class="actions">
             <button class="btn mint" id="mint">Mint</button>
-            <button class="btn ghost" id="connect">Connect Wallet</button>
           </div>
           <p class="note">Mainnet · ERC-1155 · Supply 10,000</p>
         </div>
-        <div class="card">
-          <img src="assets/kinun-omamori-v2.png" alt="Prosperity Omamori" />
+        <div class="card" id="viewer" aria-label="3D viewer">
+          <div class="card-inner" id="card">
+            <img src="assets/kinun-omamori-v2.png" alt="Prosperity Omamori" draggable="false" />
+          </div>
         </div>
       </section>
 
@@ -33,6 +38,18 @@
         <div class="chip">Base URI: raw GitHub</div>
       </section>
     </main>
+
+    <dialog class="wallet-modal" id="wallet-modal">
+      <div class="wallet-header">
+        <h2>Choose Wallet</h2>
+        <p>Select a wallet to connect for minting.</p>
+      </div>
+      <div class="wallet-actions">
+        <button class="wallet-btn" data-wallet="argent">Argent</button>
+        <button class="wallet-btn" data-wallet="braavos">Braavos</button>
+      </div>
+      <button class="wallet-close" id="wallet-close">Close</button>
+    </dialog>
 
     <script src="mint.js"></script>
   </body>

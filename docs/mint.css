@@ -89,6 +89,11 @@ h1 {
   color: #5a3124;
 }
 
+.lede.en {
+  font-family: "Cormorant Garamond", "EB Garamond", "Times New Roman", serif;
+  color: #6f3a2a;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -128,12 +133,15 @@ h1 {
 
 .card {
   position: relative;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 24px;
-  padding: 28px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 28px;
+  padding: clamp(24px, 4vw, 40px);
   box-shadow: 0 25px 60px var(--shadow);
   display: grid;
   place-items: center;
+  perspective: 1200px;
+  width: min(60vw, 520px);
+  max-width: 92vw;
 }
 
 .card::before {
@@ -145,10 +153,18 @@ h1 {
   pointer-events: none;
 }
 
+.card-inner {
+  transform-style: preserve-3d;
+  transition: transform 0.1s linear;
+}
+
 .card img {
-  width: min(80vw, 360px);
-  max-height: 60vh;
+  width: min(90vw, 420px);
+  max-height: 70vh;
   display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
 }
 
 .details {
@@ -169,9 +185,62 @@ h1 {
 @media (max-width: 720px) {
   .card {
     padding: 20px;
+    width: min(86vw, 420px);
   }
 
   .card img {
-    width: min(86vw, 320px);
+    width: min(86vw, 340px);
   }
+}
+
+.wallet-modal {
+  border: none;
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 360px;
+  width: 88vw;
+  box-shadow: 0 24px 60px rgba(21, 12, 7, 0.3);
+}
+
+.wallet-modal::backdrop {
+  background: rgba(18, 8, 6, 0.45);
+}
+
+.wallet-header h2 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+}
+
+.wallet-header p {
+  margin: 0 0 18px;
+  color: #6f3a2a;
+  font-size: 0.9rem;
+}
+
+.wallet-actions {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.wallet-btn {
+  border: 1px solid rgba(26, 18, 13, 0.2);
+  border-radius: 14px;
+  padding: 12px 16px;
+  background: #fff8ef;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.wallet-btn:hover {
+  border-color: rgba(227, 75, 46, 0.5);
+}
+
+.wallet-close {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: rgba(26, 18, 13, 0.08);
+  cursor: pointer;
 }
