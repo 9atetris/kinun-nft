@@ -103,11 +103,11 @@ h1 {
 }
 
 .connect-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: nowrap;
   gap: 12px;
   justify-content: center;
-  width: min(420px, 100%);
+  width: min(360px, 100%);
 }
 
 .mint-row {
@@ -121,7 +121,6 @@ h1 {
   border-radius: 18px;
   padding: 0 28px;
   font-size: 1rem;
-  min-width: 190px;
   height: 52px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.2s ease;
@@ -132,7 +131,8 @@ h1 {
   border: 1px solid rgba(227, 75, 46, 0.35);
   color: #5a3124;
   text-align: center;
-  width: 100%;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .btn.mint {
@@ -140,6 +140,7 @@ h1 {
   color: #fff7ea;
   box-shadow: 0 16px 30px rgba(243, 139, 31, 0.35);
   font-size: 1.05rem;
+  min-width: 200px;
 }
 
 .btn.mint:hover {
